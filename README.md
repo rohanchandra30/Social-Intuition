@@ -1,2 +1,2 @@
-# Spectral-Intuition
+# Social-Intuition
 Currently under research development
