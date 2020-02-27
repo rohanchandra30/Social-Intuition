@@ -6,10 +6,10 @@ from adjacency import *
 
 # SET THESE TWO PARAMS
 num = 21 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
+cen_num = 1 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
 if num >= 20:
     agent_num = num%20
     num = int(num/10)
-cen_num = 1 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
 
 
 centrality_labels = ['Closeness Centrality Value','Degree Centrality Value','Eigenvector Centrality Value']
@@ -22,7 +22,7 @@ sets = ['4',        #0
         '10_30_18', #4
         '13-2019-08-27-22-30-18', #5
         '16_30_18', #6
-        '10']       #7
+        '10']       #7 (not operational at the moment)
 frames= [[0,60],[47,80],[[55,95],[70,98]], [52,98],[14,50], [59,85], [65,72]]
 agent_IDs = [983,2677,[2810,2958,2959],1336,3494,1295,1786]
 radius = [10,20,10,20,20,10,10]
