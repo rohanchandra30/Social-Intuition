@@ -5,8 +5,8 @@ import numpy as np
 from adjacency import *
 
 # SET THESE TWO PARAMS
-num = 6 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
-cen_num = 1 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
+num = 4 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
+cen_num = 0 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
 if num >= 20:
     agent_num = num%20
     num = int(num/10)
@@ -68,7 +68,7 @@ for fr,item in enumerate(adj_mats):
     elif cen_num == 1:
         g = nx.degree_centrality(G)
     else:
-        g = nx.eigenvector_centrality(G)
+        g = nx.eigenvector_centrality(G, max_iter=10000)
     # eg = nx.eigenvector_centrality(G)
     print(fr,g[agent_idx])
     if fr >=frame[0] and fr <= frame[1]:
