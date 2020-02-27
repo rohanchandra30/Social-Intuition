@@ -5,7 +5,7 @@ import numpy as np
 from adjacency import *
 
 # SET THESE TWO PARAMS
-num = 21 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
+num = 6 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
 cen_num = 1 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
 if num >= 20:
     agent_num = num%20
@@ -63,14 +63,18 @@ weave_list2 = []
 weave_list3 = []
 for fr,item in enumerate(adj_mats):
     G = nx.from_numpy_array(item['adj_matrix'])
-    cg=nx.closeness_centrality(G)
-    dg = nx.degree_centrality(G)
+    if cen_num == 0:
+        g=nx.closeness_centrality(G)
+    elif cen_num == 1:
+        g = nx.degree_centrality(G)
+    else:
+        g = nx.eigenvector_centrality(G)
     # eg = nx.eigenvector_centrality(G)
-    print(fr,cg[agent_idx])
+    print(fr,g[agent_idx])
     if fr >=frame[0] and fr <= frame[1]:
     # if fr < 60:
-        weave_list.append(cg[0]) # num/id- 0,0, 1/1, 2/0, 3/0, 4/0
-        weave_list2.append(cg[agent_idx])
+        weave_list.append(g[0]) # num/id- 0,0, 1/1, 2/0, 3/0, 4/0
+        weave_list2.append(g[agent_idx])
         # weave_list2.append(cg[7])
     # weave_list3.append(cg[8])
 
