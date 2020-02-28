@@ -5,38 +5,62 @@ import numpy as np
 from adjacency import *
 
 # SET THESE THREE PARAMS
-num = 0 # [0-6] See "sets" variable. Set 2 has 3 agents, so you have to give options '20', '21', and '22' which correspond to the 1st, 2nd, and 3rd agents respectively
-cen_num = 0 #0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
+'''
+num:     [0-8] See "sets" variable. 
+
+         Set 2 has 3 agents, so you have to give options '20', '21', and '22' 
+         which correspond to the 1st, 2nd, and 3rd agents respectively. 
+         
+         Set 7 has 2 agents, so you have to set'70' or '71' accordingly.
+        
+cen_num: 0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2:eigenvector (num == 3,4)
+
+color:   Turn on region coloring
+'''
+num = 8
+cen_num = 0
 color = True
-if num >= 20:
+
+# ================================================================================================
+
+
+
+
+if num >= 20 and num <=30:
     agent_num = num%20
+    num = int(num/10)
+
+if num >= 40 and num <=80:
+    agent_num = num%70
     num = int(num/10)
 
 
 LineThick = 3
 FontSize = 24
-sets = ['4',
+sets = ['4',        #0
         '12_55_47', #1
         '11_30_18', #2
         '7_30_18_2',#3
         '10_30_18', #4
         '13-2019-08-27-22-30-18', #5
         '16_30_18', #6
-        '10']       #7 (not operational at the moment)       #0
-frames= [[0,60],[47,80],[[55,95],[70,98]], [52,98],[14,50], [59,85], [65,72]]
-agent_IDs = [983,2677,[2810,2958,2959],1336,3494,1295,1786]
-radius = [10,20,10,20,20,10,10]
-agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus', 'White Truck', 'White Lorry', 'Motorbike']
+        '9_47_10', #7
+        '5_55_47', #8
+        '10']       #9 (not operational at the moment)
+frames= [[0,60],[47,80],[[55,95],[70,98]], [52,98],[14,50], [59,85], [65,72],[[50,100],[9,35]],[58,90]]
+agent_IDs = [983,2677,[2810,2958,2959],1336,3494,1295,1786, [[2562],[2564]],1750]
+radius = [10,20,10,20,20,10,10,10,10]
+agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus', 'White Truck', 'White Lorry', 'Motorbike', 'Scooter','Scooter']
 centrality_labels = ['Closeness Centrality Value','Degree Centrality Value','Eigenvector Centrality Value']
-thresholds = [[0,35,60],[47,61,80],[],[52,73,98],[14,40,50],[59,75,85],[65,68,72]]
+thresholds = [[0,35,60],[47,61,80],[],[52,73,98],[14,40,50],[59,75,85],[65,68,72],[[50,75,100],[9,18,35]],[58,80,90]]
 
 set = sets[num]
-frame = frames[num] if num != 2 else frames[num][agent_num]
+frame = frames[num] if (num != 2 and num !=7) else frames[num][agent_num]
 agent_ID = agent_IDs[num]
 rad = radius[num]
 agent_label = agent_labels[num]
 centrality_label = centrality_labels[cen_num]
-x_lims = thresholds[num]
+x_lims = thresholds[num] if (num != 2 and num !=7) else thresholds[num][agent_num]
 
 # filenames = os.listdir('data/')
 filepath = 'data/set'+str(set)+'_annotations_utm.json'
@@ -60,7 +84,7 @@ for each_frame in sample_annotation:
 
 to_array = np.asarray(to_list)
 obj_IDs = np.unique(to_array[:, 1]).astype(int)
-agent_idx = list(obj_IDs).index(agent_ID[agent_num]) if num==2 else list(obj_IDs).index(agent_ID)
+agent_idx = list(obj_IDs).index(agent_ID[agent_num]) if (num==2 or num==7) else list(obj_IDs).index(agent_ID)
 adj_mats = generate_adjacency(to_array,rad)
 weave_list = []
 weave_list2 = []
