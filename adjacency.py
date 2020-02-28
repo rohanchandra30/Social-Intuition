@@ -32,7 +32,6 @@ def create_adjacent_matrix(scene_array_, scene_ID, total_num_of_agents, radius):
     :param scene_ID: equivalent to dataset_ID
     :return: returns a list of adjacency matrices for all the frame in that scene
     '''
-    print('hi')
     scene_array_n = np.copy(scene_array_)
 
     frame_ID_adj_mat_list = []
