@@ -19,7 +19,7 @@ cen_num: 0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2: eigenvec
 
 color:   Turn on region coloring
 '''
-num = 6
+num = 0
 cen_num = 0
 color = True
 
@@ -34,9 +34,6 @@ if 40 <= num <= 80:
     agent_num = num % 70
     num = int(num / 10)
 
-
-LineThick = 3
-FontSize = 24
 sets = ['4',                        # 0
         '12_55_47',                 # 1
         '11_30_18',                 # 2
@@ -59,12 +56,12 @@ thresholds = [[0, 35, 60], [47, 61, 80], [], [52, 73, 98], [14, 40, 50],
               [59, 75, 85], [65, 68, 72], [[50, 75, 100], [9, 18, 35]], [58, 80, 90]]
 
 video_set = sets[num]
-frame = frames[num] if (num != 2 and num !=7) else frames[num][agent_num]
+frame = frames[num] if (num != 2 and num != 7) else frames[num][agent_num]
 agent_ID = agent_IDs[num]
 rad = radius[num]
 agent_label = agent_labels[num]
 centrality_label = centrality_labels[cen_num]
-x_lims = thresholds[num] if (num != 2 and num !=7) else thresholds[num][agent_num]
+x_lims = thresholds[num] if (num != 2 and num != 7) else thresholds[num][agent_num]
 
 # filenames = os.listdir('data/')
 filepath = 'data/set' + str(video_set) + '_annotations_utm.json'
@@ -110,32 +107,47 @@ for fr, item in enumerate(adj_mats):
         # weave_list2.append(cg[7])
     # weave_list3.append(cg[8])
 
-buffer2 = 7 if len(weave_list2)%2==0 else 8
-buffer = 7 if len(weave_list)%2==0 else 8
+buffer2 = 7 if len(weave_list2) % 2 == 0 else 8
+buffer = 7 if len(weave_list) % 2 == 0 else 8
 if num != 6:
     weave_list2 = signal.savgol_filter(weave_list2, len(weave_list2)-buffer2, 3)
     # weave_list = signal.savgol_filter(weave_list, len(weave_list)-buffer, 3)
 
 
 cmaps = ['#0038ff', '#00a4b2', '#4c6fb8', '#2c5167', '#9fd9ea']
-fig, ax = plt.subplots()
+LineThick = 5
+FontSize = 40
+
+fig, ax = plt.subplots(figsize=(11.0, 8.0))
 x = np.arange(frame[0], frame[1]+1)
 y = weave_list2
-ax.plot(x, y, linewidth=LineThick, label=agent_label, color='Gold')
+if len(agent_label.split()) > 1:
+    agent_color = agent_label.split()[0]
+else:
+    agent_color = 'Gold'
+ax.plot(x, y, linewidth=LineThick, label=agent_label, color=agent_color)
 if num == 0:
-    ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, label='Scooter', color='Orange')
+    ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, label='Red Car', color='Tomato')
 if color:
     for i in range(0, len(x_lims) - 1):
         ax.fill_between([x_lims[i], x_lims[i + 1]],
                         np.max(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) + 0.002,
                         np.min(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) - 0.002,
-                        facecolor=cmaps[i], alpha=0.4, interpolate=True)
+                        facecolor=cmaps[i], alpha=0.3, interpolate=True)
 plt.grid(True)
-plt.xlabel('Time (Frame Number)', fontsize=FontSize)
-plt.ylabel(centrality_label, fontsize=FontSize)
-ax.legend(loc='lower left', bbox_to_anchor=(0, 1.01), ncol=2,
-          borderaxespad=0, fontsize=FontSize - 3, frameon=False)
-plt.show()
+plt.xlabel('Frame Number', fontsize=FontSize)
+plt.ylabel(centrality_label.split()[0], fontsize=FontSize)
+for tick in ax.xaxis.get_major_ticks():
+    tick.label.set_fontsize(FontSize - 7)
+for tick in ax.yaxis.get_major_ticks():
+    tick.label.set_fontsize(FontSize - 7)
+legend = plt.legend(loc='lower left', bbox_to_anchor=(0, 1.01), ncol=2,
+                    borderaxespad=0, fontsize=FontSize - 5, fancybox=True,
+                    facecolor='green', framealpha=0.4)
+# frame = legend.get_frame()
+# frame.set_facecolor('green')
+# frame.set_edgecolor('red')
+plt.savefig(video_set + '_' + agent_label + '.png', bbox_inches='tight')
 
 # plt.plot(range(frame[0], frame[1]+1), weave_list2, linewidth= LineThick, label=agent_label )
 # if num==0:
