@@ -15,13 +15,13 @@ num:     [0-8] See "sets" variable.
          
          Set 7 has 2 agents, so you have to set'70' or '71' accordingly.
         
-cen_num: 0:closeness (num == 0,20,21,22), 1:degree (num == 1 and 6), 2: eigenvector (num == 3,4)
+cen_num: 0:closeness (num == 0,20,21,22, 9), 1:degree (num == 1 and 6), 2: eigenvector (num == 3,4)
 
 color:   Turn on region coloring
 '''
-num = 8
-cen_num = 2
-color = True
+num = 0
+cen_num = 1
+color = False
 
 # ================================================================================================
 
@@ -43,17 +43,17 @@ sets = ['4',                        # 0
         '16_30_18',                 # 6
         '9_47_10',                  # 7
         '5_55_47',                  # 8
-        '10']                       # 9 (not operational at the moment)
-frames = [[0, 60], [47, 80], [[55, 95], [70, 98]],
+        '10_55_47']                       # 9
+frames = [[0, 60], [47, 80], [ [55, 95], [70, 98]],
           [52, 98], [14, 50], [59, 85], [65, 72], [[50, 98], [9, 35]],
-          [58, 90]]
-agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750]
-radius = [10, 20, 10, 20, 20, 10, 10, 10, 10]
+          [58, 90],[10,98]]
+agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750,868]
+radius = [10, 20, 10, 20, 20, 10, 10, 10, 10, 10]
 agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
-                'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter']
+                'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike']
 centrality_labels = ['Closeness Centrality Value', 'Degree Centrality Value', 'Eigenvector Centrality Value']
-thresholds = [[0, 35, 60], [47, 61, 80], [[55,80, 95],[55,80, 95],[55,80, 95]], [52, 73, 98], [14, 40, 50],
-              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90]]
+thresholds = [[0, 35, 60], [47, 61, 80], [ [55,80, 95],[70,80, 98],[70,80, 98]], [52, 73, 98], [14, 40, 50],
+              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90],[21,26]]
 
 video_set = sets[num]
 frame = frames[num] if (num != 2 and num != 7) else frames[num][agent_num]
@@ -125,15 +125,18 @@ if len(agent_label.split()) > 1:
     agent_color = agent_label.split()[0]
 else:
     agent_color = 'Gold'
-ax.plot(x, y, linewidth=LineThick, label='Car A', color=agent_color)
+ax.plot(range(frame[0], frame[1]+1), y, linewidth=LineThick, label=agent_label, color='k')
 if num == 0:
-    ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, label='Car B', color='Tomato')
+    ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, color='k')
+    # ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, label='Red Car', color='Tomato')
 if color:
     for i in range(0, len(x_lims) - 1):
         ax.fill_between([x_lims[i], x_lims[i + 1]],
                         np.max(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) + 0.002,
                         np.min(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) - 0.002,
                         facecolor=cmaps[i], alpha=0.3, interpolate=True)
+        # ax.fill_between([25, 35], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
+        # ax.fill_between([75, 85], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
 plt.grid(True)
 plt.xlabel('Frame Number', fontsize=FontSize)
 plt.ylabel(centrality_label.split()[0], fontsize=FontSize)
@@ -141,9 +144,11 @@ for tick in ax.xaxis.get_major_ticks():
     tick.label.set_fontsize(FontSize - 7)
 for tick in ax.yaxis.get_major_ticks():
     tick.label.set_fontsize(FontSize - 7)
-legend = plt.legend(loc='lower left', bbox_to_anchor=(0, 1.01), ncol=2,
-                    borderaxespad=0, fontsize=FontSize - 5, fancybox=True,
-                    facecolor='green', framealpha=0.4)
+# Turn off tick labels
+# ax.set_yticklabels([])
+# legend = plt.legend(loc='lower left', bbox_to_anchor=(0, 1.01), ncol=2,
+#                     borderaxespad=0, fontsize=FontSize - 5, fancybox=True,
+#                     facecolor='green', framealpha=0.4)
 # frame = legend.get_frame()
 # frame.set_facecolor('green')
 # frame.set_edgecolor('red')
@@ -156,4 +161,4 @@ plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tig
 # plt.xlabel('Time (Frame Number)', fontsize=FontSize)
 # plt.ylabel(centrality_label, fontsize=FontSize)
 # plt.legend(loc='upper left', fontsize=FontSize)
-# plt.show()
+plt.show()
