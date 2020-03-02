@@ -44,16 +44,16 @@ sets = ['4',                        # 0
         '9_47_10',                  # 7
         '5_55_47',                  # 8
         '10_55_47']                 # 9
-frames = [[0, 60], [47, 80], [ [55, 95], [70, 98]],
+frames = [[0, 60], [47, 80], [[55, 95], [70, 98]],
           [52, 98], [14, 50], [59, 85], [65, 72], [[50, 98], [9, 35]],
-          [58, 90],[10,98]]
-agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750,868]
+          [58, 90], [10, 98]]
+agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750, 868]
 radius = [10, 20, 10, 20, 20, 10, 10, 10, 10, 10]
 agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
                 'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike']
 centrality_labels = ['Closeness Centrality Value', 'Degree Centrality Value', 'Eigenvector Centrality Value']
-thresholds = [[0, 35, 60], [47, 61, 80], [ [55,80, 95],[70,80, 98],[70,80, 98]], [52, 73, 98], [14, 40, 50],
-              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90],[21,26]]
+thresholds = [[0, 35, 60], [47, 61, 80], [[55, 80, 95], [70, 80, 98], [70, 80, 98]], [52, 73, 98], [14, 40, 50],
+              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90], [21, 26]]
 
 video_set = sets[num]
 frame = frames[num] if (num != 2 and num != 7) else frames[num][agent_num]
@@ -125,9 +125,9 @@ if len(agent_label.split()) > 1:
     agent_color = agent_label.split()[0]
 else:
     agent_color = 'Gold'
-ax.plot(range(frame[0], frame[1]+1), y, linewidth=LineThick, label=agent_label, color='k')
+ax.plot(x, y, linewidth=LineThick, label=agent_label, color='k')
 if num == 0:
-    ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, color='k')
+    ax.plot(x, weave_list, linewidth=LineThick, color='k')
     # ax.plot(range(frame[0], frame[1]+1), weave_list, linewidth=LineThick, label='Red Car', color='Tomato')
 if color:
     for i in range(0, len(x_lims) - 1):
@@ -152,7 +152,7 @@ for tick in ax.yaxis.get_major_ticks():
 # frame = legend.get_frame()
 # frame.set_facecolor('green')
 # frame.set_edgecolor('red')
-plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
+# plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
 
 # plt.plot(range(frame[0], frame[1]+1), weave_list2, linewidth= LineThick, label=agent_label )
 # if num==0:
