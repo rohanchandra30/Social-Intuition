@@ -19,9 +19,9 @@ cen_num: 0:closeness (num == 0,20,21,22, 9), 1:degree (num == 1 and 6), 2: eigen
 
 color:   Turn on region coloring
 '''
-num = 0
+num = 9
 cen_num = 1
-color = False
+color = True
 
 # ================================================================================================
 
@@ -53,7 +53,7 @@ agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
                 'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike']
 centrality_labels = ['Closeness Centrality Value', 'Degree Centrality Value', 'Eigenvector Centrality Value']
 thresholds = [[0, 35, 60], [47, 61, 80], [[55, 80, 95], [70, 80, 98], [70, 80, 98]], [52, 73, 98], [14, 40, 50],
-              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90], [21, 26]]
+              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90], [24, 36]]
 
 video_set = sets[num]
 frame = frames[num] if (num != 2 and num != 7) else frames[num][agent_num]
@@ -64,6 +64,8 @@ centrality_label = centrality_labels[cen_num]
 x_lims = thresholds[num] if (num != 2 and num != 7) else thresholds[num][agent_num]
 
 # filenames = os.listdir('data/')
+
+# READ CSV FILE PANDAS
 filepath = 'data/set' + str(video_set) + '_annotations_utm.json'
 
 with open(filepath) as json_file:
@@ -119,8 +121,10 @@ LineThick = 5
 FontSize = 40
 
 fig, ax = plt.subplots(figsize=(11.0, 8.0))
-x = np.arange(frame[0], frame[1]+1)
+x = np.arange(frame[0], frame[1] + 1)
 y = weave_list2
+# x = np.arange(frame[0], frame[1])
+# y = weave_list2[2:] - 2 * weave_list2[:-1]
 if len(agent_label.split()) > 1:
     agent_color = agent_label.split()[0]
 else:
@@ -134,7 +138,7 @@ if color:
         ax.fill_between([x_lims[i], x_lims[i + 1]],
                         np.max(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) + 0.002,
                         np.min(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) - 0.002,
-                        facecolor=cmaps[i], alpha=0.3, interpolate=True)
+                        facecolor='tomato', alpha=0.6, interpolate=True)
         # ax.fill_between([25, 35], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
         # ax.fill_between([75, 85], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
 plt.grid(True)
@@ -152,7 +156,7 @@ for tick in ax.yaxis.get_major_ticks():
 # frame = legend.get_frame()
 # frame.set_facecolor('green')
 # frame.set_edgecolor('red')
-# plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
+plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
 
 # plt.plot(range(frame[0], frame[1]+1), weave_list2, linewidth= LineThick, label=agent_label )
 # if num==0:
@@ -161,4 +165,4 @@ for tick in ax.yaxis.get_major_ticks():
 # plt.xlabel('Time (Frame Number)', fontsize=FontSize)
 # plt.ylabel(centrality_label, fontsize=FontSize)
 # plt.legend(loc='upper left', fontsize=FontSize)
-plt.show()
+# plt.show()

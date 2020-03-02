@@ -9,6 +9,10 @@ from adjacency import *
 from scipy import signal
 
 
+num = 11
+cen_num = 0
+color = True
+
 start_frames = []
 end_frames = []
 with open('aggressive_frames.csv') as csv_file:
@@ -38,19 +42,21 @@ with open('aggressive_frames.csv') as csv_file:
 
 # 0 - '30_18_7(front)' -    SLC         77.0    79  2,
 # 1 - '30_18_10(rear)' -    SLC         28.125  31  2.875,
-# 2 - '30_18_11(rear)' -    W           67.375  69  1.625,
-# 3 - '30_18_11(front)' -   OT          94.8125 96  1.1875,
+# 2 - '30_18_11(rear)' -    OT          94.8125 96  1.1875,
+# 3 - '30_18_11(front)' -   W           67.375  69  1.625,
 # 4 - '30_18_13(front)' -   W           71.5    75  3.5,
 # 5 - '30_18_16(front)' -   OS          70.0625 68  2.0625,
 # 6 - '47_10_9(front)' -    OS          17.875  18  0.125,
 # 7 - '47_10_9(rear)' -     OT          75.0625 75  0.0625,
 # 8 - '55_47_4(rear)' -     OT          45.0    49  4,
 # 9 - '55_47_5(rear)' -     SLC         72.5625 76  3.4375,
-# 10 - '55_47_12(front) -   OS
-
-num = 7
-cen_num = 0
-color = True
+# 10 - '55_47_12(front) -   OS          65.125
+# 11 - 1001.csv         -   SLC         31.5625 34  2.4375
+# 12 - 1351.csv         -   OS          27.625  25  2.625
+# 13 - 1901.csv         -   OS          32.1875 31  1.1875
+# 14 - 3451.csv         -   OS          25.875  28  2.125
+# 15 - 4351.csv         -   OS          32.75   30  2.75
+# 16 - 4751.csv         -   OS          32.375  29  3.375
 
 agent_num = 0
 if 20 <= num <= 30:
@@ -71,13 +77,17 @@ if 40 <= num <= 80:
 #           [[50, 98], [9, 35]],
 #           [58, 90],
 #           [10, 98]]
-frames = [[52, 98], [14, 50], [55, 95], [70, 98], [59, 85], [65, 72],
-          [9, 35], [50, 98], [0, 60], [58, 90], [10, 98]]
+frames = [[52, 98], [14, 50], [70, 98], [55, 95], [59, 85], [65, 72],
+          [9, 35], [50, 98], [0, 60], [58, 90], [10, 98],
+          [12, 48], [10, 50], [12, 50], [9, 43], [11, 50], [10, 50]]
 # agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750, 868]
-agent_IDs = [1336, 3494, 2958, 2959, 1295, 1786, 2564, 2562, 983, 1750, 2677, 868]
-radius = [10, 20, 10, 20, 20, 10, 10, 10, 10, 10]
+agent_IDs = [1336, 3494, 2959, 2810, 1295, 1786, 2562, 2564, 983, 1750, 2677,
+             33138, 102040, 32227, 29137, 44854, 28362]
+radius = [10, 20, 10, 10, 20, 10, 10, 10, 10, 10, 10,
+          10, 10, 16, 10, 20, 10]
 agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
-                'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike']
+                'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike', 'White Car',
+                'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent']
 centrality_labels = ['Closeness Centrality Value', 'Degree Centrality Value', 'Eigenvector Centrality Value']
 # thresholds = [[0, 35, 60], [47, 61, 80], [[55, 80, 95], [70, 80, 98], [70, 80, 98]], [52, 73, 98], [14, 40, 50],
 #               [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90], [21, 26]]
@@ -90,8 +100,14 @@ agent_label = agent_labels[num]
 centrality_label = centrality_labels[cen_num]
 # x_lims = thresholds[num] if (num != 2 and num != 7) else thresholds[num][agent_num]
 mean_start_frame = np.mean(start_frames, axis=0)
+std_start_frame = np.std(start_frames, axis=0)
 mean_end_frame = np.mean(end_frames, axis=0)
+std_end_frame = np.std(end_frames, axis=0)
 x_lims = [mean_start_frame[num], mean_end_frame[num]]
+x_start_lims = [mean_start_frame[num] - std_start_frame[num],
+                mean_start_frame[num] + std_start_frame[num]]
+x_end_lims = [mean_end_frame[num] - std_end_frame[num],
+              mean_end_frame[num] + std_end_frame[num]]
 
 for v in range(len(video_names)):
     if video_names[v].split('_')[-2].lower() == 'gt':
@@ -99,23 +115,43 @@ for v in range(len(video_names)):
     else:
         video_names[v] = '_'.join(video_names[v].split('_')[:-1])
 # filenames = os.listdir('data/')
-filepath = os.path.join('data', video_names[num] + '.json')
-
-with open(filepath) as json_file:
-    sample_annotation = json.load(json_file)
 
 dataset_id = 1
-
 to_list = []
+if num < 11:
+    file_path = os.path.join('data', video_names[num] + '.json')
+    with open(file_path) as json_file:
+        sample_annotation = json.load(json_file)
 
-for each_frame in sample_annotation:
-    fr_id = each_frame['id']
-    each_annotation = each_frame['annotations']
-    for each_object in each_annotation:
-        obj_id = each_object['classId']
-        x = each_object['geometry']['position']['x']
-        y = each_object['geometry']['position']['y']
-        to_list.append([fr_id, obj_id, x, y, dataset_id])
+    for each_frame in sample_annotation:
+        fr_id = each_frame['id']
+        each_annotation = each_frame['annotations']
+        for each_object in each_annotation:
+            obj_id = each_object['classId']
+            x = each_object['geometry']['position']['x']
+            y = each_object['geometry']['position']['y']
+            to_list.append([fr_id, obj_id, x, y, dataset_id])
+else:
+    file_path = os.path.join('data', video_names[num] + '.csv')
+    with open(file_path) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        fr = 0
+        for line_count, row in enumerate(csv_reader):
+            if line_count == 0:
+                continue
+            else:
+                if line_count == 1:
+                    curr_frame = float(row[0])
+                    prev_frame = float(row[0])
+                else:
+                    prev_frame = np.copy(curr_frame)
+                    curr_frame = float(row[0])
+                    if curr_frame != prev_frame:
+                        fr += 1
+                obj_id = int(row[1].split('-')[-1])
+                x = float(row[3])
+                y = float(row[4])
+                to_list.append([fr, obj_id, x, y, dataset_id])
 
 to_array = np.asarray(to_list)
 obj_IDs = np.unique(to_array[:, 1]).astype(int)
@@ -158,7 +194,10 @@ LineThick = 5
 FontSize = 40
 
 fig, ax = plt.subplots(figsize=(11.0, 8.0))
-x = np.arange(frame[0], frame[1]+1)
+if num in [12, 13, 15, 16]:
+    x = np.arange(frame[0], frame[1] - 1)
+else:
+    x = np.arange(frame[0], frame[1] + 1)
 y = weave_list2
 if len(agent_label.split()) > 1:
     agent_color = agent_label.split()[0]
@@ -176,11 +215,25 @@ if color:
                         np.min(
                             y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]) - 0.002,
                         facecolor=cmaps[i], alpha=0.3, interpolate=True)
+        ax.fill_between([x_start_lims[i], x_start_lims[i + 1]],
+                        np.max(
+                            y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]) + 0.002,
+                        np.min(
+                            y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]) - 0.002,
+                        facecolor=cmaps[i + 1], alpha=0.3, interpolate=True)
+        ax.fill_between([x_end_lims[i], x_end_lims[i + 1]],
+                        np.max(
+                            y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]) + 0.002,
+                        np.min(
+                            y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]) - 0.002,
+                        facecolor=cmaps[i + 1], alpha=0.3, interpolate=True)
         # ax.fill_between([25, 35], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
         # ax.fill_between([75, 85], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
     # plt.errorbar(start_frames[num],
     #              np.mean(y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]),
     #              x_err=start_frames[:, num] - mean_start_frame[num])
+ax.plot([31.5625 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='--', linewidth=LineThick)
+ax.plot([34 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='-.', linewidth=LineThick)
 plt.grid(True)
 plt.xlabel('Frame Number', fontsize=FontSize)
 plt.ylabel(centrality_label.split()[0], fontsize=FontSize)
@@ -205,9 +258,10 @@ for tick in ax.yaxis.get_major_ticks():
 # plt.xlabel('Time (Frame Number)', fontsize=FontSize)
 # plt.ylabel(centrality_label, fontsize=FontSize)
 # plt.legend(loc='upper left', fontsize=FontSize)
-plt.show()
+# plt.show()
+plt.savefig('images/' + video_names[num] + '_' + agent_label + '.png', bbox_inches='tight')
 
 weave_list_grad = np.abs(weave_list2[1:] - weave_list2[:-1])
-estimated_mean_frame = fr_list[np.argmax(weave_list_grad)]
+estimated_mean_frame = fr_list[np.argmax(weave_list_grad[1:]) + 1]
 data_mean_frame = np.mean(x_lims)
 temp = 1
