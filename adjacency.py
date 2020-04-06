@@ -25,6 +25,58 @@ def get_coordinates(scene_array_,fr,ag):
 
     return x,y
 
+def create_degree_matrix(scene_array_, deg_vector, total_num_of_agents, radius):
+    '''
+        Creates adjacency matrix for each frame
+        :param scene_array_: formatted data of one dataset
+        :param scene_ID: equivalent to dataset_ID
+        :return: returns a list of adjacency matrices for all the frame in that scene
+        '''
+
+
+    scene_array_n = np.copy(scene_array_)
+
+    frame_ID_adj_mat_list = []
+
+    lar = total_num_of_agents  # use 270 for LYFT
+
+    for fr in range(int(np.amin(scene_array_n[:, 0]))+1, int(np.amax(scene_array_n[:, 0]) + 1)):
+        frame_ID_adj_mat_dict = {}
+        adj_matrix = np.zeros((lar, lar), dtype=np.float64)
+
+        frame = scene_array_n[np.where(scene_array_n[:, 0] == fr)]
+        frame_prev = scene_array_n[np.where(scene_array_n[:, 0] == fr-1)]
+        obj_set = set(np.unique(frame[:, 1]).astype(int))
+        obj_set_prev = set(np.unique(frame_prev[:, 1]).astype(int))
+
+        for i in range(0 + 1, adj_matrix.shape[0] + 1):
+
+            for j in range(1, adj_matrix.shape[1] + 1):
+
+                if i!=j and j in obj_set and i in obj_set and j in obj_set_prev and i in obj_set_prev:
+
+                    x1_prev, y1_prev = get_coordinates(scene_array_n, fr-1, i)
+                    x1, y1 = get_coordinates(scene_array_n, fr, i)
+                    x2_prev, y2_prev = get_coordinates(scene_array_n, fr-1, j)
+                    x2, y2 = get_coordinates(scene_array_n, fr, j)
+
+                    a = np.array((x1_prev, y1_prev, 0))
+                    b = np.array((x2_prev, y2_prev, 0))
+                    c = np.array((x1, y1, 0))
+                    d = np.array((x2, y2, 0))
+
+                    vel_i = np.linalg.norm(a - c)
+                    vel_j = np.linalg.norm(b - d)
+                    euc_dist = np.linalg.norm(c - d)
+
+                    if euc_dist < radius and vel_i>vel_j and j not in deg_vector[i]:
+                        deg_vector[i].append(np.count_nonzero(deg_vector[i])+1)
+                    else:
+                        deg_vector[i].append(0)
+
+    return deg_vector
+
+
 def create_adjacent_matrix(scene_array_, scene_ID, total_num_of_agents, radius):
     '''
     Creates adjacency matrix for each frame
@@ -38,7 +90,7 @@ def create_adjacent_matrix(scene_array_, scene_ID, total_num_of_agents, radius):
 
     lar = total_num_of_agents    # use 270 for LYFT
 
-    for fr in range(int(np.amin(scene_array_n[:,0]) + 1),int(np.amax(scene_array_n[:,0]) + 1)):
+    for fr in range(int(np.amin(scene_array_n[:,0]) ),int(np.amax(scene_array_n[:,0]) + 1)):
         frame_ID_adj_mat_dict = {}
         adj_matrix = np.zeros((lar, lar), dtype = np.float64)
 
@@ -103,10 +155,10 @@ def generate_adjacency(dir, radius):
     # total_num_of_agents = 15
 
     for d_id in dataset_IDs:
-        print('1')
         one_dataset = data[np.where(data[:, 4] == d_id)]  # data_id
         obj_IDs = np.unique(one_dataset[:, 1]).astype(int)
         d = dict([(y, x + 1) for x, y in enumerate(sorted(set(obj_IDs)))])
+        deg_vec = dict([(x + 1,[]) for x, y in enumerate(sorted(set(obj_IDs)))])
 
         for each_obj_ID in obj_IDs:
             # print(each_obj_ID)
@@ -116,8 +168,8 @@ def generate_adjacency(dir, radius):
             one_obj_traj[:, 1] = new_array
             one_dataset[np.where(one_dataset[:, 1] == each_obj_ID)] = one_obj_traj
     total_num_of_agents = len(obj_IDs) # use 270 for LYFT,  use 170 for ARGO, use 905 for Apolloscape, use 14 for Singapore
-
-    return create_adjacent_matrix(one_dataset, d_id, total_num_of_agents, radius)
+    degree_mat = create_degree_matrix(one_dataset, deg_vec, total_num_of_agents, radius)
+    return degree_mat, create_adjacent_matrix(one_dataset, d_id, total_num_of_agents, radius)
 
 def rates(list_train, DATA_SET):
     '''

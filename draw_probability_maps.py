@@ -9,9 +9,9 @@ from adjacency import *
 from scipy import signal
 
 
-num = 11
-cen_num = 0
-color = True
+num = 13 # 11-16
+cen_num = 1
+color = False
 
 start_frames = []
 end_frames = []
@@ -84,7 +84,7 @@ frames = [[52, 98], [14, 50], [70, 98], [55, 95], [59, 85], [65, 72],
 agent_IDs = [1336, 3494, 2959, 2810, 1295, 1786, 2562, 2564, 983, 1750, 2677,
              33138, 102040, 32227, 29137, 44854, 28362]
 radius = [10, 20, 10, 10, 20, 10, 10, 10, 10, 10, 10,
-          10, 10, 16, 10, 20, 10]
+          10, 10, 16, 10, 20, 50]
 agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
                 'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike', 'White Car',
                 'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent', 'Red Agent']
@@ -132,7 +132,7 @@ if num < 11:
             y = each_object['geometry']['position']['y']
             to_list.append([fr_id, obj_id, x, y, dataset_id])
 else:
-    file_path = os.path.join('data', video_names[num] + '.csv')
+    file_path = os.path.join('argo_data', video_names[num] + '.csv')
     with open(file_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         fr = 0
@@ -232,8 +232,8 @@ if color:
     # plt.errorbar(start_frames[num],
     #              np.mean(y[int(np.floor(x_lims[i])) - frame[0]:int(np.ceil(x_lims[i + 1])) - frame[0] + 1]),
     #              x_err=start_frames[:, num] - mean_start_frame[num])
-ax.plot([31.5625 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='--', linewidth=LineThick)
-ax.plot([34 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='-.', linewidth=LineThick)
+# ax.plot([31.5625 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='--', linewidth=LineThick)
+# ax.plot([34 for _ in range(2)], [np.min(y) - 0.002, np.max(y) + 0.002], linestyle='-.', linewidth=LineThick)
 plt.grid(True)
 plt.xlabel('Frame Number', fontsize=FontSize)
 plt.ylabel(centrality_label.split()[0], fontsize=FontSize)
@@ -258,8 +258,28 @@ for tick in ax.yaxis.get_major_ticks():
 # plt.xlabel('Time (Frame Number)', fontsize=FontSize)
 # plt.ylabel(centrality_label, fontsize=FontSize)
 # plt.legend(loc='upper left', fontsize=FontSize)
-# plt.show()
-plt.savefig('images/' + video_names[num] + '_' + agent_label + '.png', bbox_inches='tight')
+fig2, ax2 = plt.subplots(figsize=(15.0, 12.0))
+line, = ax2.plot(x, y,linewidth=LineThick, color='k')
+plt.grid(True)
+
+for tick in ax2.xaxis.get_major_ticks():
+    tick.label.set_fontsize(FontSize - 7)
+for tick in ax2.yaxis.get_major_ticks():
+    tick.label.set_fontsize(FontSize - 7)
+# y_init = list([0]*len(y))
+
+#
+for n in range(len(x)):
+    line.set_data(x[:n], y[:n])
+    # ax2.axis([0, 100, 0, ])
+    fig.canvas.draw()
+    plt.savefig('video_materials/' + video_names[num] + '_' + '{}.png'.format(n), bbox_inches='tight')
+
+
+
+
+plt.show()
+# plt.savefig('images/' + video_names[num] + '_' + agent_label + '.png', bbox_inches='tight')
 
 weave_list_grad = np.abs(weave_list2[1:] - weave_list2[:-1])
 estimated_mean_frame = fr_list[np.argmax(weave_list_grad[1:]) + 1]

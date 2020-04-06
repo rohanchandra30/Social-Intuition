@@ -19,9 +19,9 @@ cen_num: 0:closeness (num == 0,20,21,22, 9), 1:degree (num == 1 and 6), 2: eigen
 
 color:   Turn on region coloring
 '''
-num = 9
-cen_num = 1
-color = True
+num = 6
+cen_num = 0
+color = False
 
 # ================================================================================================
 
@@ -44,16 +44,16 @@ sets = ['4',                        # 0
         '9_47_10',                  # 7
         '5_55_47',                  # 8
         '10_55_47']                 # 9
-frames = [[0, 60], [47, 80], [[55, 95], [70, 98]],
-          [52, 98], [14, 50], [59, 85], [65, 72], [[50, 98], [9, 35]],
+frames = [[0, 60], [47, 80], [[55, 95], [70, 98],[70, 98]],
+          [52, 98], [14, 50], [59, 85], [65, 72], [ [9, 35], [50, 98]],
           [58, 90], [10, 98]]
 agent_IDs = [983, 2677, [2810, 2958, 2959], 1336, 3494, 1295, 1786, [[2562], [2564]], 1750, 868]
-radius = [10, 20, 10, 20, 20, 10, 10, 10, 10, 10]
+radius = [10, 20, 10, 20, 20, 10, 20, 10, 10, 10]
 agent_labels = ['Black Car', 'White Car', 'White Car', 'White Bus',
                 'White Truck', 'White Lorry', 'Motorbike', 'Scooter', 'Scooter', 'Motorbike']
 centrality_labels = ['Closeness Centrality Value', 'Degree Centrality Value', 'Eigenvector Centrality Value']
 thresholds = [[0, 35, 60], [47, 61, 80], [[55, 80, 95], [70, 80, 98], [70, 80, 98]], [52, 73, 98], [14, 40, 50],
-              [59, 75, 85], [65, 68, 72], [[50, 75, 98], [9, 18, 35]], [58, 80, 90], [24, 36]]
+              [59, 75, 85], [65, 68, 72], [ [9, 18, 35], [50, 75, 98]], [58, 80, 90], [24, 36]]
 
 video_set = sets[num]
 frame = frames[num] if (num != 2 and num != 7) else frames[num][agent_num]
@@ -88,7 +88,7 @@ for each_frame in sample_annotation:
 to_array = np.asarray(to_list)
 obj_IDs = np.unique(to_array[:, 1]).astype(int)
 agent_idx = list(obj_IDs).index(agent_ID[agent_num]) if (num == 2 or num == 7) else list(obj_IDs).index(agent_ID)
-adj_mats = generate_adjacency(to_array, rad)
+degree_mat, adj_mats = generate_adjacency(to_array, rad)
 weave_list = []
 weave_list2 = []
 weave_list3 = []
@@ -138,7 +138,7 @@ if color:
         ax.fill_between([x_lims[i], x_lims[i + 1]],
                         np.max(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) + 0.002,
                         np.min(y[x_lims[i]-frame[0]:x_lims[i + 1]-frame[0]+1]) - 0.002,
-                        facecolor='tomato', alpha=0.6, interpolate=True)
+                        facecolor=cmaps[i], alpha=0.6, interpolate=True)
         # ax.fill_between([25, 35], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
         # ax.fill_between([75, 85], np.max(y),np.min(y), facecolor='red', alpha=0.2, interpolate=True)
 plt.grid(True)
@@ -156,7 +156,26 @@ for tick in ax.yaxis.get_major_ticks():
 # frame = legend.get_frame()
 # frame.set_facecolor('green')
 # frame.set_edgecolor('red')
-plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
+# plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tight')
+# fig2, ax2 = plt.subplots(figsize=(15.0, 12.0))
+# line, = ax2.plot(x, y,linewidth=LineThick, color='k')
+# plt.grid(True)
+# # plt.xlabel('Frame Number', fontsize=FontSize)
+# # plt.ylabel(centrality_label.split()[0], fontsize=FontSize)
+# for tick in ax2.xaxis.get_major_ticks():
+#     tick.label.set_fontsize(FontSize - 7)
+# for tick in ax2.yaxis.get_major_ticks():
+#     tick.label.set_fontsize(FontSize - 7)
+# y_init = list([0]*len(y))
+
+
+
+# for n in range(len(x)):
+#     line.set_data(x[:n], y[:n])
+#     # ax2.axis([0, 100, 0, ])
+#     fig.canvas.draw()
+#     plt.savefig('video_materials/' + video_set + '_' + '{}.png'.format(n), bbox_inches='tight')
+
 
 # plt.plot(range(frame[0], frame[1]+1), weave_list2, linewidth= LineThick, label=agent_label )
 # if num==0:
@@ -165,4 +184,4 @@ plt.savefig('images/' + video_set + '_' + agent_label + '.png', bbox_inches='tig
 # plt.xlabel('Time (Frame Number)', fontsize=FontSize)
 # plt.ylabel(centrality_label, fontsize=FontSize)
 # plt.legend(loc='upper left', fontsize=FontSize)
-# plt.show()
+plt.show()
